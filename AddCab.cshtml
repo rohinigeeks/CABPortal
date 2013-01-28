@@ -1,0 +1,536 @@
+﻿@{
+    Page.Title = "Add Cab";
+    Layout = "~/_SiteLayout.cshtml";
+
+    var PageError = "";
+    var PageMessage = "";
+
+    /* DataGrid Pagination Variables  */
+    var dgTotalRecords = 0;
+    var dgPageSize = 0;
+    var dgCurrentPage = 1;
+    var dgCurrentOffset = 0;
+    /* DataGrid Pagination Variables  */
+
+    var i = 1;
+
+    if (!Request.QueryString["page"].IsEmpty())
+    {
+        dgCurrentPage = Request.QueryString["page"].AsInt();
+    }
+
+    if (Session["User"] == null)
+    {
+        Response.Redirect("~/Login?redirect=AddCab");
+    }
+
+    var db = Database.Open("StarterSite");
+    #region post
+    if (IsPost)
+    {
+        if (!Request.Form["btnSubmit"].IsEmpty())
+        {
+            var txtVehicleNo = Request.Form["txtVehicleNo"].ToString().Trim();
+            var txtDriverName = Request.Form["txtDriverName"].ToString().Trim();
+            var txtVehicleName = Request.Form["txtVehicleName"].ToString().Trim();
+            var intCabType = Request.Form["ddCabType"].ToString().AsInt();
+            var txtZone = Request.Form["txtZone"].ToString().Trim();
+            var txtAddress = Request.Form["txtAddress"].ToString().Trim();
+            var txtDriverMobile = Request.Form["txtDriverMobile"].ToString().Trim();
+            var intAvailability = Request.Form["ddAvailability"].ToString().Trim();
+            var txtRemarks = Request.Form["txtRemarks"].ToString().Trim();
+            var intStartReading = Request.Form["txtStartReading"].ToString().Trim().AsInt();
+            var intEndReading = Request.Form["txtEndReading"].ToString().Trim().AsInt();
+            var intTotalRun = Request.Form["txtTotalRun"].ToString().Trim().AsInt();
+            int result = 0;
+
+            if (!txtDriverName.IsEmpty() && !txtVehicleNo.IsEmpty())
+            {
+                var command = "INSERT INTO CabDetails (VehicleNumber, DriverName, CabType, DriverMobile, Zone, InitialReading, FinalReading, TotalRun, DriverAddress, Remarks, AvailabilityID, VehicleName) " +
+                    " VALUES( @0 , @1 , @2, @3, @4 , @5 , @6 , @7 , @8 , @9 , @10 , @11 )";
+
+                try
+                {
+                    result = db.Execute(command, txtVehicleNo, txtDriverName, intCabType, txtDriverMobile, txtZone, intStartReading, intEndReading, intTotalRun, txtAddress, txtRemarks, intAvailability, txtVehicleName);
+                }
+                catch (Exception ex)
+                {
+                    PageError = ex.Message;
+                }
+                finally
+                {
+                    if (result == 1)
+                    {
+                        PageMessage = "Cab successfully added.";
+                    }
+                    else
+                    {
+                        //Some Error Occured
+                        if (PageError.IsEmpty())
+                        {
+                            PageError = "Unable to update database.";
+                        }
+
+                    }
+                }
+
+            }
+            else
+            {
+                if (txtVehicleNo.IsEmpty())
+                {
+                    PageError = "Required field Vehicle Number is missing";
+                }
+                else
+                {
+                    PageError = "Required field Driver Name is missing";
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region CabGrid
+    var numOfRows = 3;
+    int result1 = 0;
+
+    if (!IsPost)
+    {
+        numOfRows = 3;
+    }
+    else
+    {
+        if (Request.Form["hidNumberOfRows"] != null)
+        {
+            numOfRows = Request.Form["hidNumberOfRows"].AsInt();
+        }
+    }
+
+
+    if (!Request.QueryString["delete"].IsEmpty())
+    {
+        var cabIDDeleting = Request.QueryString["delete"].AsInt();
+        if (cabIDDeleting > 0)
+        {
+            var deleteCommand = "DELETE FROM CabDetails WHERE CabID = @0";
+
+            try
+            {
+                result1 = db.Execute(deleteCommand, cabIDDeleting);
+            }
+            catch (Exception ex)
+            {
+                PageError = ex.Message;
+            }
+            finally
+            {
+                if (result1 == 1)
+                {
+                    PageMessage = "Cab successfully deleted.";
+                }
+            }
+        }
+    }
+
+
+
+    var totalCountQuery = "SELECT COUNT(CabID) AS Count FROM CabDetails";
+    var countData = db.QuerySingle(totalCountQuery);
+    dgTotalRecords = countData.Count;
+
+    if (dgTotalRecords != 0)
+    {
+        if (dgTotalRecords > numOfRows)
+        {
+            dgPageSize = dgTotalRecords / numOfRows;
+            if (dgTotalRecords % numOfRows > 0)
+            {
+                dgPageSize += 1;
+            }
+        }
+        else
+        {
+            dgPageSize = 1;
+            dgCurrentOffset = 1;
+        }
+
+        if (dgCurrentPage > 1 && dgCurrentPage <= dgPageSize)
+        {
+            dgCurrentOffset = (dgCurrentPage - 1) * numOfRows;
+        }
+        else
+        {
+            dgCurrentOffset = 0;
+        }
+    }
+
+    var selectQueryString = "SELECT CabID, VehicleNumber, VehicleName, DriverName, CASE CabType WHEN 1 THEN 'Regular' ELSE 'Outsourced' END AS CabType, " + 
+        " DriverMobile, Zone, InitialReading, FinalReading, TotalRun, DriverAddress, AvailabilityMaster.Name AS Availability, Remarks FROM CabDetails   " +
+        " JOIN AvailabilityMaster ON CabDetails.AvailabilityID = AvailabilityMaster.AvailableID " + 
+        " ORDER BY CabID OFFSET " + dgCurrentOffset.ToString() + " ROWS FETCH NEXT " + numOfRows.ToString() + " ROWS ONLY";
+    var data = db.Query(selectQueryString);
+#endregion
+    
+}
+
+@section sectionNavDashboard{
+    <ul class="select">
+        <li><a href="#nogo"><b>Dashboard</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="#nogo">Dashboard Details 1</a></li>
+                    <li><a href="#nogo">Dashboard Details 2</a></li>
+                    <li><a href="#nogo">Dashboard Details 3</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavCab{
+    <ul class="current">
+        <li><a href="#nogo"><b>CAB</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub show">
+                <ul class="sub">
+                    <li class="sub_show"><a href="~/AddCab">Add Cab</a></li>
+                    <li><a href="~/BookCab">Book Cab</a></li>
+                    <li><a href="~/LocateCab">Locate Cab</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavCustomer{
+    <ul class="select">
+        <li><a href="#nogo"><b>Customer</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="~/AddCustomer">Add</a></li>
+                    <li><a href="#nogo">Categories Details 2</a></li>
+                    <li><a href="#nogo">Categories Details 3</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavReport{
+    <ul class="select">
+        <li><a href="#nogo"><b>Report</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="#nogo">Transaction</a></li>
+                    <li><a href="#nogo">Cab</a></li>
+                    <li><a href="#nogo">Customer</a></li>
+
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavAdmin{
+    <ul class="select">
+        <li><a href="#nogo"><b>Administration</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="~/ListUsers">User</a></li>
+                    <li><a href="#nogo">Change Password</a></li>
+                    <li><a href="#nogo">Backup Database</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+<div id="page-heading">
+    <h1>Add Cab</h1>
+</div>
+
+<table border="0" width="100%" cellpadding="0" cellspacing="0" id="content-table">
+    <tr>
+        <th rowspan="3" class="sized">
+            <img src="~/Images/shared/side_shadowleft.jpg" width="20" height="300" alt="" /></th>
+        <th class="topleft"></th>
+        <td id="tbl-border-top">&nbsp;</td>
+        <th class="topright"></th>
+        <th rowspan="3" class="sized">
+            <img src="~/Images/shared/side_shadowright.jpg" width="20" height="300" alt="" /></th>
+    </tr>
+    <tr>
+        <td id="tbl-border-left"></td>
+        <td>
+            <!--  start content-table-inner -->
+            <div id="content-table-inner">
+
+                <form id="AddCabForm" method="post">
+                    <table border="0" width="100%" cellpadding="0" cellspacing="0" cell-border="1">
+                        <tr valign="top">
+                            <td>
+
+                                @{ if (!PageError.IsEmpty())
+                                   {
+                                    <!--  start message-red -->
+                                    <div id="message-red">
+                                        <table border="0" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td class="red-left">Error. @PageError <a href="~/AddCab">Please try again.</a></td>
+                                                <td class="red-right"><a class="close-red">
+                                                    <img src="images/table/icon_close_red.gif" alt="" /></a></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <!--  end message-red -->
+                                   }
+                                }
+
+
+
+                                @{ if (!PageMessage.IsEmpty())
+                                   {
+                                    <!--  start message-green -->
+                                    <div id="message-green">
+                                        <table border="0" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td class="green-left">Success. @PageMessage </td>
+                                                <td class="green-right"><a class="close-green">
+                                                    <img src="images/table/icon_close_green.gif" alt="" /></a></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <!--  end message-green -->
+                                   }
+                                }
+
+                                <!--  AM[01]-->
+                                <table border="0" cellpadding="0" cellspacing="0" cell-border="1" id="id-form">
+                                    <tr>
+                                        <th valign="top">Vehicle No.</th>
+                                        <td>
+                                            <input name="txtVehicleNo" type="text" id="txtVehicleNo" class="inp-form" />
+                                        </td>
+                                        <th valign="top"></th>
+                                        <th valign="top">Driver Name</th>
+                                        <td>
+                                            <input name="txtDriverName" type="text" id="txtDriverName" tabindex="1" class="inp-form" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Vehicle Name</th>
+                                        <td>
+                                            <input name="txtVehicleName" type="text" id="txtVehicleName" class="inp-form" />
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">CAB Type</th>
+                                        <td>
+                                            <select id="ddCabType" name="ddCabType" class="styledselect_form_1">
+                                                <option value="1">Regular</option>
+                                                <option value="2">OutSourced</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Zone/Location</th>
+                                        <td>
+                                            <input name="txtZone" type="text" id="txtZone" class="inp-form" />
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">Address</th>
+                                        <td>
+                                            <input name="txtAddress" type="text" id="txtAddress" class="inp-form" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Mobile No.</th>
+                                        <td>
+                                            <input name="txtDriverMobile" type="text" id="txtDriverMobile" class="inp-form" />
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">Availablity</th>
+                                        <td>
+                                            <select id="ddAvailability" name="ddAvailability" class="styledselect_form_1">
+                                                @{ var availQuery = "SELECT AvailableID, Name FROM AvailabilityMaster";
+                                                   var availabilityData = db.Query(availQuery);
+                                                   foreach (var row in availabilityData)
+                                                   {
+                                                    <option value="@row.AvailableID">@row.Name</option>
+                                                   }                                            
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Start Reading</th>
+                                        <td>
+                                            <input name="txtStartReading" type="text" id="txtStartReading" value="0" class="inp-form" />
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">End Reading</th>
+                                        <td>
+                                            <input name="txtEndReading" type="text" id="y=txtEndReading" value="0" class="inp-form" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Total Run</th>
+                                        <td>
+                                            <input name="txtTotalRun" type="text" id="txtTotalRun" value="0" class="inp-form" />
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">Remarks</th>
+                                        <td>
+                                            <input name="txtRemarks" type="text" id="txtRemarks" class="inp-form" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td style="float: right;">
+                                            <input type="submit" id="btnSubmit" name="btnSubmit" class="form-submit" /></td>
+                                        <td></td>
+                                        <td>
+                                            <input type="reset" id="btnReset" class="form-reset" /></td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                                <!--  AM[01]-->
+
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr valign="top">
+                            <td>
+
+                                <table border="0" cellpadding="0" cellspacing="0" id="id-form" width="60%">
+                                    <tr>
+                                        <th valign="top">Search</th>
+                                        <th valign="top">
+                                            <input name="txtSearchVehicleNo" type="text" id="txtSearchVehicleNo" class="inp-form" />
+                                        </th>
+                                        <td></td>
+                                        <th valign="top">
+                                            <input type="button" value="Search" title="Search" class="form-submit" />
+                                        </th>
+                                        <td></td>
+                                    </tr>
+                                </table>
+
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <!--  start table-content  -->
+                                <div id="table-content">
+
+                                    <!--  start product-table ..................................................................................... -->
+
+                                    <table border="0" width="100%" cellpadding="0" cellspacing="0" id="product-table">
+                                        <tr>
+
+                                            <th class="table-header-repeat line-left minwidth-1"><a href="#">Vehicle Number</a>	</th>
+                                            <th class="table-header-repeat line-left"><a href="#">Vehicle Name</a></th>
+                                            <th class="table-header-repeat line-left"><a href="#">Driver Name</a></th>
+                                            <th class="table-header-repeat line-left"><a href="#">Zone</a></th>
+                                            <th class="table-header-repeat line-left"><a href="#">Availability</a></th>
+                                            <th class="table-header-options line-left"><a href="#">Options</a></th>
+                                        </tr>
+                                        @{foreach (DynamicRecord record in data)
+                                          {
+                                              var attrib = "";
+                                              if (i % 2 != 0) { attrib = "class='alternate-row'"; }
+                                            <tr @attrib>
+                                                <td>@record["VehicleNumber"]</td>
+                                                <td>@record["VehicleName"]</td>
+                                                <td>@record["DriverName"]</td>
+                                                <td>@record["Zone"]</td>
+                                                <td>@record["Availability"]</td>
+                                                <td class="options-width">
+                                                    <a href="~/AddCab?delete=@record["CabID"]" title="Delete" class="icon-2 info-tooltip"></a>
+                                                </td>
+                                            </tr>
+                                              i++;
+                                          }
+                 
+                                        }
+
+                                    </table>
+                                    <!--  end product-table................................... -->
+
+                                </div>
+                                <!--  end content-table  -->
+
+                                <!--  start paging..................................................... -->
+                                <table border="0" cellpadding="0" cellspacing="0" id="paging-table">
+                                    <tr>
+                                        <td>
+                                            <a href="~/AddCab?page=1" class="page-far-left"></a>
+                                            @{ var leftPageNumber = 1;
+                                               if (dgCurrentPage == 1)
+                                               {
+                                                   leftPageNumber = 1;
+                                               }
+                                               else
+                                               {
+                                                   leftPageNumber = dgCurrentPage - 1;
+                                               }
+                                                <a href="~/AddCab?page=@leftPageNumber" class="page-left"></a>
+                                            }
+                                            <div id="page-info">Page <strong>@dgCurrentPage</strong> / @dgPageSize</div>
+                                            @{ var rightPageNumber = dgCurrentPage + 1;
+                                               if (dgCurrentPage == dgPageSize)
+                                               {
+                                                   rightPageNumber = dgPageSize;
+                                               }
+                                               else if (dgCurrentPage < dgPageSize)
+                                               {
+                                                   rightPageNumber = dgCurrentPage + 1;
+                                               }
+                                                <a href="~/AddCab?page=@rightPageNumber" class="page-right"></a>
+                                            }
+                                            <a href="~/AddCab?page=@dgPageSize" class="page-far-right"></a>
+                                        </td>
+                                        <td>
+                                            <select id="ddNumberOfRows" class="styledselect_pages">
+                                                <option value="3">Number of rows</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!--  end paging................ -->
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="~/Images/shared/blank.gif" width="695" height="1" alt="blank" /></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </form>
+                <div class="clear"></div>
+
+
+            </div>
+            <!--  end content-table-inner  -->
+        </td>
+        <td id="tbl-border-right"></td>
+    </tr>
+    <tr>
+        <th class="sized bottomleft"></th>
+        <td id="tbl-border-bottom">&nbsp;</td>
+        <th class="sized bottomright"></th>
+    </tr>
+</table>

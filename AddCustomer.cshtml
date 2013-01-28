@@ -1,0 +1,500 @@
+﻿@{
+    Page.Title = "Add Customer";
+    Layout = "~/_SiteLayout.cshtml";
+
+    
+    var PageError = "";
+    var PageMessage = "";
+
+    /* DataGrid Pagination Variables  */
+    var dgTotalRecords = 0;
+    var dgPageSize = 0;
+    var dgCurrentPage = 1;
+    var dgCurrentOffset = 0;
+    /* DataGrid Pagination Variables  */
+
+    var i = 1;
+
+    if (!Request.QueryString["page"].IsEmpty())
+    {
+        dgCurrentPage = Request.QueryString["page"].AsInt();
+    }
+
+    if (Session["User"] == null)
+    {
+        Response.Redirect("~/Login?redirect=AddCustomer");
+    }
+
+    var db = Database.Open("StarterSite");
+    #region post
+    if (IsPost)
+    {
+        if (!Request.Form["btnSubmit"].IsEmpty())
+        {
+            var txtCustomerName = Request.Form["txtCustomerName"].ToString().Trim();
+            var txtCustomerPhone = Request.Form["txtCustomerPhone"].ToString().Trim();
+            var txtLocation = Request.Form["txtLocation"].ToString().Trim();
+            var txtAddress = Request.Form["txtAddress"].ToString().Trim();
+            var txtCustomerMobile = Request.Form["txtCustomerMobile"].ToString().Trim();
+            var intCustomerType = Request.Form["ddCustomerType"].ToString().Trim();
+
+
+            int result = 0;
+
+            if (!txtCustomerMobile.IsEmpty() && !txtCustomerName.IsEmpty())
+            {
+                var command = "INSERT INTO CustomerDetails (Name, CustomerMobile, CustomerPhone, Location, Address, Type) " +
+                    " VALUES( @0 , @1 , @2, @3, @4 , @5 )";
+
+                try
+                {
+                    result = db.Execute(command, txtCustomerName, txtCustomerMobile, txtCustomerPhone, txtLocation, txtAddress, intCustomerType);
+                }
+                catch (Exception ex)
+                {
+                    PageError = ex.Message;
+                }
+                finally
+                {
+                    if (result == 1)
+                    {
+                        PageMessage = "Customer successfully added.";
+                    }
+                    else
+                    {
+                        //Some Error Occured
+                        if (PageError.IsEmpty())
+                        {
+                            PageError = "Unable to update database.";
+                        }
+
+                    }
+                }
+
+            }
+            else
+            {
+                if (txtCustomerName.IsEmpty())
+                {
+                    PageError = "Required field Name is missing";
+                }
+                else
+                {
+                    PageError = "Required field Mobile Number is missing";
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region CustomerGrid
+    var numOfRows = 3;
+    int result1 = 0;
+
+    if (!IsPost)
+    {
+        numOfRows = 3;
+    }
+    else
+    {
+        if (Request.Form["hidNumberOfRows"] != null)
+        {
+            numOfRows = Request.Form["hidNumberOfRows"].AsInt();
+        }
+    }
+
+
+    if (!Request.QueryString["delete"].IsEmpty())
+    {
+        var cabIDDeleting = Request.QueryString["delete"].AsInt();
+        if (cabIDDeleting > 0)
+        {
+            var deleteCommand = "DELETE FROM CustomerDetails WHERE CustomerID = @0";
+
+            try
+            {
+                result1 = db.Execute(deleteCommand, cabIDDeleting);
+            }
+            catch (Exception ex)
+            {
+                PageError = ex.Message;
+            }
+            finally
+            {
+                if (result1 == 1)
+                {
+                    PageMessage = "Cab successfully deleted.";
+                }
+            }
+        }
+    }
+
+
+
+    var totalCountQuery = "SELECT COUNT(CustomerID) AS Count FROM CustomerDetails";
+    var countData = db.QuerySingle(totalCountQuery);
+    dgTotalRecords = countData.Count;
+
+    if (dgTotalRecords != 0)
+    {
+        if (dgTotalRecords > numOfRows)
+        {
+            dgPageSize = dgTotalRecords / numOfRows;
+            if (dgTotalRecords % numOfRows > 0)
+            {
+                dgPageSize += 1;
+            }
+        }
+        else
+        {
+            dgPageSize = 1;
+            dgCurrentOffset = 1;
+        }
+
+        if (dgCurrentPage > 1 && dgCurrentPage <= dgPageSize)
+        {
+            dgCurrentOffset = (dgCurrentPage - 1) * numOfRows;
+        }
+        else
+        {
+            dgCurrentOffset = 0;
+        }
+    }
+
+    var selectQueryString = "SELECT CustomerID, Name, CustomerMobile, CustomerPhone, CASE Type WHEN 1 THEN 'Permanent' ELSE 'Temporary' END AS Type, " +
+        " Location, Address  FROM CustomerDetails   " +
+        " ORDER BY CustomerID OFFSET " + dgCurrentOffset.ToString() + " ROWS FETCH NEXT " + numOfRows.ToString() + " ROWS ONLY";
+    var data = db.Query(selectQueryString);
+#endregion
+    
+}
+
+@section sectionNavDashboard{
+    <ul class="select">
+        <li><a href="#nogo"><b>Dashboard</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="#nogo">Dashboard Details 1</a></li>
+                    <li><a href="#nogo">Dashboard Details 2</a></li>
+                    <li><a href="#nogo">Dashboard Details 3</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavCab{
+    <ul class="select">
+        <li><a href="#nogo"><b>CAB</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="~/AddCab">Add Cab</a></li>
+                    <li><a href="~/BookCab">Book Cab</a></li>
+                    <li><a href="~/LocateCab">Locate Cab</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavCustomer{
+    <ul class="current">
+        <li><a href="#nogo"><b>Customer</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub show">
+                <ul class="sub">
+                    <li class="sub_show"><a href="~/AddCustomer">Add</a></li>
+                    <li><a href="#nogo">Categories Details 2</a></li>
+                    <li><a href="#nogo">Categories Details 3</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavReport{
+    <ul class="select">
+        <li><a href="#nogo"><b>Report</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="#nogo">Transaction</a></li>
+                    <li><a href="#nogo">Cab</a></li>
+                    <li><a href="#nogo">Customer</a></li>
+
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavAdmin{
+    <ul class="select">
+        <li><a href="#nogo"><b>Administration</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="~/ListUsers">User</a></li>
+                    <li><a href="#nogo">Change Password</a></li>
+                    <li><a href="#nogo">Backup Database</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+<div id="page-heading">
+    <h1>Add Customer</h1>
+</div>
+
+<table border="0" width="100%" cellpadding="0" cellspacing="0" id="content-table">
+    <tr>
+        <th rowspan="3" class="sized">
+            <img src="~/Images/shared/side_shadowleft.jpg" width="20" height="300" alt="" /></th>
+        <th class="topleft"></th>
+        <td id="tbl-border-top">&nbsp;</td>
+        <th class="topright"></th>
+        <th rowspan="3" class="sized">
+            <img src="~/Images/shared/side_shadowright.jpg" width="20" height="300" alt="" /></th>
+    </tr>
+    <tr>
+        <td id="tbl-border-left"></td>
+        <td>
+            <!--  start content-table-inner -->
+            <div id="content-table-inner">
+
+
+                <form id="AddCustomerForm" method="post">
+                    <table border="0" width="100%" cellpadding="0" cellspacing="0" cell-border="1">
+                        <tr valign="top">
+                            <td>
+                                @{ if (!PageError.IsEmpty())
+                                   {
+                                    <!--  start message-red -->
+                                    <div id="message-red">
+                                        <table border="0" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td class="red-left">Error. @PageError <a href="~/AddCustomer">Please try again.</a></td>
+                                                <td class="red-right"><a class="close-red">
+                                                    <img src="images/table/icon_close_red.gif" alt="" /></a></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <!--  end message-red -->
+                                   }
+                                }
+
+
+
+                                @{ if (!PageMessage.IsEmpty())
+                                   {
+                                    <!--  start message-green -->
+                                    <div id="message-green">
+                                        <table border="0" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td class="green-left">Success. @PageMessage </td>
+                                                <td class="green-right"><a class="close-green">
+                                                    <img src="images/table/icon_close_green.gif" alt="" /></a></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <!--  end message-green -->
+                                   }
+                                }
+                                <!--  AM[02]-->
+                                <table border="0" cellpadding="0" cellspacing="0" cell-border="1" id="id-form">
+                                    <tr>
+                                        <th valign="top">Customer ID</th>
+                                        <td>
+                                            <input name="txtCustomerID" type="text" id="txtCustomerID" disabled="disabled" class="inp-form" />
+                                        </td>
+                                        <th valign="top"></th>
+                                        <th valign="top">Customer Name</th>
+                                        <td>
+                                            <input name="txtCustomerName" type="text" id="txtCustomerName" class="inp-form" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Address</th>
+                                        <td colspan="4">
+                                            <textarea id="txtAddress" name="txtAddress" rows="" cols="" class="form-textarea"></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Location</th>
+                                        <td>
+                                            <input name="txtLocation" type="text" id="txtLocation" class="inp-form" />
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">Customer Type
+                                        </th>
+                                        <td>
+                                            <select name="ddCustomerType" id="ddCustomerType" class="styledselect_form_1">
+                                                <option value="1">Permanent</option>
+                                                <option value="2">Temporary</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Mobile No.</th>
+                                        <td>
+                                            <input name="txtCustomerMobile" type="text" id="txtCustomerMobile" class="inp-form" />
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">Phone No.</th>
+                                        <td>
+                                            <input name="txtCustomerPhone" type="text" id="txtCustomerPhone" class="inp-form" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td style="float: right;">
+                                            <input type="submit" id="btnSubmit" name="btnSubmit" class="form-submit" /></td>
+                                        <td></td>
+                                        <td>
+                                            <input type="reset" value="" class="form-reset" /></td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                                <!-- AM[02]-->
+
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr valign="top">
+                            <td>
+
+                                <table border="0" cellpadding="0" cellspacing="0" id="id-form" width="60%">
+                                    <tr>
+                                        <th valign="top">Search</th>
+                                        <th valign="top">
+                                            <input name="txtSearchCustomerName" type="text" id="txtSearchCustomerName" class="inp-form" />
+                                        </th>
+                                        <td></td>
+                                        <th valign="top">
+                                            <input type="button" value="Search" title="Search" class="form-submit" />
+                                        </th>
+                                        <td></td>
+                                    </tr>
+                                </table>
+
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <!--  start table-content  -->
+                                <div id="table-content">
+
+                                    <!--  start product-table ..................................................................................... -->
+
+                                    <table border="0" width="100%" cellpadding="0" cellspacing="0" id="product-table">
+                                        <tr>
+
+                                            <th class="table-header-repeat line-left minwidth-1"><a href="#">Customer Name</a>	</th>
+                                            <th class="table-header-repeat line-left"><a href="#">Mobile Numnber</a></th>
+                                            <th class="table-header-repeat line-left"><a href="#">Address</a></th>
+                                            <th class="table-header-repeat line-left"><a href="#">Zone</a></th>
+                                            <th class="table-header-repeat line-left"><a href="#">Phone Number</a></th>
+                                            <th class="table-header-repeat line-left"><a href="#">Type</a></th>
+                                            <th class="table-header-options line-left"><a href="#">Options</a></th>
+                                        </tr>
+                                        @{foreach (DynamicRecord record in data)
+                                          {
+                                              var attrib = "";
+                                              if (i % 2 != 0) { attrib = "class='alternate-row'"; }
+                                            <tr @attrib>
+                                                <td>@record["Name"]</td>
+                                                <td>@record["CustomerMobile"]</td>
+                                                <td>@record["Address"]</td>
+                                                <td>@record["Location"]</td>
+                                                <td>@record["CustomerPhone"]</td>
+                                                <td>@record["Type"]</td>
+                                                <td class="options-width">
+                                                    <a href="~/AddCustomer?delete=@record["CustomerID"]" title="Delete" class="icon-2 info-tooltip"></a>
+                                                </td>
+                                            </tr>
+                                              i++;
+                                          }
+                 
+                                        }
+
+                                    </table>
+                                    <!--  end product-table................................... -->
+
+                                </div>
+                                <!--  end content-table  -->
+
+                                <!--  start paging..................................................... -->
+                                <table border="0" cellpadding="0" cellspacing="0" id="paging-table">
+                                    <tr>
+                                        <td>
+                                            <a href="~/AddCustomer?page=1" class="page-far-left"></a>
+                                            @{ var leftPageNumber = 1;
+                                               if (dgCurrentPage == 1)
+                                               {
+                                                   leftPageNumber = 1;
+                                               }
+                                               else
+                                               {
+                                                   leftPageNumber = dgCurrentPage - 1;
+                                               }
+                                                <a href="~/AddCustomer?page=@leftPageNumber" class="page-left"></a>
+                                            }
+                                            <div id="page-info">Page <strong>@dgCurrentPage</strong> / @dgPageSize</div>
+                                            @{ var rightPageNumber = dgCurrentPage + 1;
+                                               if (dgCurrentPage == dgPageSize)
+                                               {
+                                                   rightPageNumber = dgPageSize;
+                                               }
+                                               else if (dgCurrentPage < dgPageSize)
+                                               {
+                                                   rightPageNumber = dgCurrentPage + 1;
+                                               }
+                                                <a href="~/AddCustomer?page=@rightPageNumber" class="page-right"></a>
+                                            }
+                                            <a href="~/AddCustomer?page=@dgPageSize" class="page-far-right"></a>
+                                        </td>
+                                        <td>
+                                            <select id="ddNumberOfRows" class="styledselect_pages">
+                                                <option value="3">Number of rows</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!--  end paging................ -->
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="~/Images/shared/blank.gif" width="695" height="1" alt="blank" /></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </form>
+
+                <div class="clear"></div>
+
+
+            </div>
+            <!--  end content-table-inner  -->
+        </td>
+        <td id="tbl-border-right"></td>
+    </tr>
+    <tr>
+        <th class="sized bottomleft"></th>
+        <td id="tbl-border-bottom">&nbsp;</td>
+        <th class="sized bottomright"></th>
+    </tr>
+</table>

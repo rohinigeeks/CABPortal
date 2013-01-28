@@ -1,0 +1,136 @@
+﻿@{    
+    Layout = "~/_SiteLayout.cshtml";
+    
+    }
+
+
+@section sectionNavDashboard{
+    <ul class="select">
+        <li><a href="#nogo"><b>Dashboard</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="#nogo">Dashboard Details 1</a></li>
+                    <li><a href="#nogo">Dashboard Details 2</a></li>
+                    <li><a href="#nogo">Dashboard Details 3</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavCab{
+    <ul class="select">
+        <li><a href="#nogo"><b>CAB</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="~/AddCab">Add Cab</a></li>
+                    <li><a href="~/BookCab">Book Cab</a></li>
+                    <li><a href="~/LocateCab">Locate Cab</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavCustomer{
+    <ul class="select">
+        <li><a href="#nogo"><b>Customer</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li ><a href="~/AddCustomer">Add</a></li>
+                    <li><a href="#nogo">Categories Details 2</a></li>
+                    <li><a href="#nogo">Categories Details 3</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavReport{
+    <ul class="select">
+        <li><a href="#nogo"><b>Report</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="#nogo">Transaction</a></li>
+                    <li><a href="#nogo">Cab</a></li>
+                    <li><a href="#nogo">Customer</a></li>
+
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavAdmin{
+    <ul class="current">
+        <li><a href="#nogo"><b>Administration</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub show">
+                <ul class="sub">
+                    <li class="sub_show"><a href="~/ListUsers">User</a></li>
+                    <li><a href="#nogo">Change Password</a></li>
+                    <li><a href="#nogo">Backup Database</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+    <table border="0" width="100%" cellpadding="0" cellspacing="0" id="content-table">
+	<tr>
+		<th rowspan="3" class="sized"><img src="images/shared/side_shadowleft.jpg" width="20" height="300" alt="" /></th>
+		<th class="topleft"></th>
+		<td id="tbl-border-top">&nbsp;</td>
+		<th class="topright"></th>
+		<th rowspan="3" class="sized"><img src="images/shared/side_shadowright.jpg" width="20" height="300" alt="" /></th>
+	</tr>
+	<tr>
+		<td id="tbl-border-left"></td>
+		<td>
+		<!--  start content-table-inner ...................................................................... START -->
+		<div id="content-table-inner">
+		
+			<!--  start table-content  -->
+			<div id="table-content">
+			
+				
+				
+				<!--  start message-red -->
+				<div id="message-red">
+				<table border="0" width="100%" cellpadding="0" cellspacing="0">
+				<tr>
+					<td class="red-left">Error.  You are not authorised to view this page. <a href="~/Login">Please login with administrative credentials.</a></td>
+					<td class="red-right"><a class="close-red"><img src="images/table/icon_close_red.gif"   alt="" /></a></td>
+				</tr>
+				</table>
+				</div>
+				<!--  end message-red -->			
+				
+		
+		 
+				
+			</div>
+			<!--  end content-table  -->			
+			
+			<div class="clear"></div>
+		 
+		</div>
+		<!--  end content-table-inner ............................................END  -->
+		</td>
+		<td id="tbl-border-right"></td>
+	</tr>
+	<tr>
+		<th class="sized bottomleft"></th>
+		<td id="tbl-border-bottom">&nbsp;</td>
+		<th class="sized bottomright"></th>
+	</tr>
+	</table>

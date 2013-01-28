@@ -1,0 +1,340 @@
+﻿@{        
+    if (Session["User"] == null)
+    {
+        Response.Redirect("~/Login");
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@Page.Title</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" media="screen" title="default" />
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width" />
+    <!--[if IE]>
+        <link rel="stylesheet" media="all" type="text/css" href="~/Content/pro_dropline_ie.css" />        
+    <![endif]-->
+
+    <!--  jquery core -->
+    <script src="~/Scripts/jquery-1.4.1.min.js" type="text/javascript"></script>
+
+
+    <!--  checkbox styling script -->
+    <script src="~/Scripts/ui.core.js" type="text/javascript"></script>
+    <script src="~/Scripts/ui.checkbox.js" type="text/javascript"></script>
+    <script src="~/Scripts/jquery.bind.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('input').checkBox();
+            $('#toggle-all').click(function () {
+                $('#toggle-all').toggleClass('toggle-checked');
+                $('#mainform input[type=checkbox]').checkBox('toggle');
+                return false;
+            });
+        });
+    </script>
+
+
+    <![if !IE 7]>
+
+    <!--  styled select box script version 1 -->
+    <script src="~/Scripts/jquery.selectbox-0.5.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.styledselect').selectbox({ inputClass: "selectbox_styled" });
+        });
+    </script>
+
+
+    <![endif]>
+
+
+    <!--  styled select box script version 2 -->
+    <script src="~/Scripts/jquery.selectbox-0.5_style_2.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.styledselect_form_1').selectbox({ inputClass: "styledselect_form_1" });
+            $('.styledselect_form_2').selectbox({ inputClass: "styledselect_form_2" });
+        });
+    </script>
+
+    <!--  styled select box script version 3 -->
+    <script src="~/Scripts/jquery.selectbox-0.5_style_2.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.styledselect_pages').selectbox({ inputClass: "styledselect_pages" });
+        });
+    </script>
+
+    <!--  styled file upload script -->
+    <script src="~/Scripts/jquery.filestyle.js" type="text/javascript"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(function () {
+            $("input.file_1").filestyle({
+                image: "images/forms/upload_file.gif",
+                imageheight: 29,
+                imagewidth: 78,
+                width: 300
+            });
+        });
+    </script>
+
+    <!-- Custom jquery scripts -->
+    <script src="~/Scripts/custom_jquery.js" type="text/javascript"></script>
+
+    <!-- Tooltips -->
+    <script src="~/Scripts/jquery.tooltip.js" type="text/javascript"></script>
+    <script src="~/Scripts/jquery.dimensions.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('a.info-tooltip ').tooltip({
+                track: true,
+                delay: 0,
+                fixPNG: true,
+                showURL: false,
+                showBody: " - ",
+                top: -35,
+                left: 5
+            });
+        });
+    </script>
+
+    <!--  date picker script -->
+    <link rel="stylesheet" href="css/datePicker.css" type="text/css" />
+    <script src="~/Scripts/date.js" type="text/javascript"></script>
+    <script src="~/Scripts/jquery.datePicker.js" type="text/javascript"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(function () {
+
+            // initialise the "Select date" link
+            $('#date-pick')
+                .datePicker(
+                    // associate the link with a date picker
+                    {
+                        createButton: false,
+                        startDate: '01/01/2005',
+                        endDate: '31/12/2020'
+                    }
+                ).bind(
+                    // when the link is clicked display the date picker
+                    'click',
+                    function () {
+                        updateSelects($(this).dpGetSelected()[0]);
+                        $(this).dpDisplay();
+                        return false;
+                    }
+                ).bind(
+                    // when a date is selected update the SELECTs
+                    'dateSelected',
+                    function (e, selectedDate, $td, state) {
+                        updateSelects(selectedDate);
+                    }
+                ).bind(
+                    'dpClosed',
+                    function (e, selected) {
+                        updateSelects(selected[0]);
+                    }
+                );
+
+            var updateSelects = function (selectedDate) {
+                var selectedDate = new Date(selectedDate);
+                $('#d option[value=' + selectedDate.getDate() + ']').attr('selected', 'selected');
+                $('#m option[value=' + (selectedDate.getMonth() + 1) + ']').attr('selected', 'selected');
+                $('#y option[value=' + (selectedDate.getFullYear()) + ']').attr('selected', 'selected');
+            }
+            // listen for when the selects are changed and update the picker
+            $('#d, #m, #y')
+                .bind(
+                    'change',
+                    function () {
+                        var d = new Date(
+                                    $('#y').val(),
+                                    $('#m').val() - 1,
+                                    $('#d').val()
+                                );
+                        $('#date-pick').dpSetSelected(d.asString());
+                    }
+                );
+
+            // default the position of the selects to today
+            var today = new Date();
+            updateSelects(today.getTime());
+
+            // and update the datePicker to reflect it...
+            $('#d').trigger('change');
+        });
+    </script>
+
+    <link href="~/Content/jquery.autocomplete.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery.autocomplete.js"></script>
+    <script type="text/javascript">
+        $(function () { $("#txtCustomerMobile").autocomplete({source: "~/GetCustomerMobile/" , output: "json" }) });
+    </script>
+
+    <!-- MUST BE THE LAST SCRIPT IN <HEAD></HEAD></HEAD> png fix -->
+    <script src="~/Scripts/jquery.pngFix.pack.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(document).pngFix();
+        });
+
+    </script>
+</head>
+
+<body>
+    <!-- Start: page-top-outer -->
+    <div id="page-top-outer">
+
+        <!-- Start: page-top -->
+        <div id="page-top">
+
+            <!-- start logo -->
+            <div id="logo">
+                <a href="">
+                    <img src="~/Images/shared/logo.png" width="156" height="40" alt="" /></a>
+            </div>
+            <!-- end logo -->
+
+            <!--  start top-search -->
+            <div id="top-search">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
+                            <input type="text" value="Search" onblur="if (this.value=='') { this.value='Search'; }" onfocus="if (this.value=='Search') { this.value=''; }" class="top-search-inp" /></td>
+                        <td>
+
+                            <select class="styledselect">
+                                <option value="">Cab</option>
+                                <option value="">Customer</option>
+                                <option value="">Reports</option>
+                            </select>
+
+                        </td>
+                        <td>
+                            <input type="image" src="~/Images/shared/top_search_btn.gif" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!--  end top-search -->
+            <div class="clear"></div>
+
+        </div>
+        <!-- End: page-top -->
+
+    </div>
+    <!-- End: page-top-outer -->
+
+    <div class="clear">&nbsp;</div>
+
+    <!--  start nav-outer-repeat................................................................................................. START -->
+    <div class="nav-outer-repeat">
+        <!--  start nav-outer -->
+        <div class="nav-outer">
+
+            <!-- start nav-right -->
+            <div id="nav-right">
+
+                <div class="nav-divider">&nbsp;</div>
+                <div class="showhide-account">
+                    <img src="~/Images/shared/nav/nav_myaccount.gif" width="93" height="14" alt="" />
+                </div>
+                <div class="nav-divider">&nbsp;</div>
+                <a href="~/Login?logout=true" id="logout">
+                    <img src="~/Images/shared/nav/nav_logout.gif" width="64" height="14" alt="" /></a>
+                <div class="clear">&nbsp;</div>
+
+                <!--  start account-content -->
+                <div class="account-content">
+                    <div class="account-drop-inner">
+                        <a href="" id="acc-settings">Settings</a>
+                        <div class="clear">&nbsp;</div>
+                        <div class="acc-line">&nbsp;</div>
+                        <a href="" id="acc-details">Personal details </a>
+                        <div class="clear">&nbsp;</div>
+                        <div class="acc-line">&nbsp;</div>
+                        <a href="" id="acc-project">Project details</a>
+                        <div class="clear">&nbsp;</div>
+                        <div class="acc-line">&nbsp;</div>
+                        <a href="" id="acc-inbox">Inbox</a>
+                        <div class="clear">&nbsp;</div>
+                        <div class="acc-line">&nbsp;</div>
+                        <a href="" id="acc-stats">Statistics</a>
+                    </div>
+                </div>
+                <!--  end account-content -->
+
+            </div>
+            <!-- end nav-right -->
+
+
+            <!--  start nav -->
+            <div class="nav">
+                <div class="table">
+
+                    @RenderSection("sectionNavDashboard")
+
+                    <div class="nav-divider">&nbsp;</div>
+
+                    @RenderSection("sectionNavCab")
+
+
+                    <div class="nav-divider">&nbsp;</div>
+
+                    @RenderSection("sectionNavCustomer")
+
+
+                    <div class="nav-divider">&nbsp;</div>
+                    @RenderSection("sectionNavReport")
+
+
+                    <div class="nav-divider">&nbsp;</div>
+
+                    @RenderSection("sectionNavAdmin")
+
+
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <!--  start nav -->
+
+        </div>
+        <div class="clear"></div>
+        <!--  start nav-outer -->
+    </div>
+    <!--  start nav-outer-repeat................................................... END -->
+
+    <div class="clear"></div>
+
+    <!-- start content-outer -->
+    <div id="content-outer">
+        <!-- start content -->
+        <div id="content">
+            @RenderBody()
+
+            <div class="clear">&nbsp;</div>
+
+        </div>
+        <!--  end content -->
+        <div class="clear">&nbsp;</div>
+    </div>
+    <!--  end content-outer -->
+
+    <div class="clear">&nbsp;</div>
+
+    <!-- start footer -->
+    <div id="footer">
+        <!--  start footer-left -->
+        <div id="footer-left">
+            CAB Portal &copy; Copyright KronixTech. designed by rohinigeeks <a href="">www.wyanjan.com</a>. All rights reserved.
+        </div>
+        <!--  end footer-left -->
+        <div class="clear">&nbsp;</div>
+    </div>
+    <!-- end footer -->
+
+</body>
+
+</html>

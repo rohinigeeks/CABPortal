@@ -1,0 +1,587 @@
+﻿@{
+    Page.Title = "Book Cab";
+    Layout = "~/_SiteLayout.cshtml";
+
+    if (Session["User"] == null)
+    {
+        Response.Redirect("~/Login?redirect=BookCab");
+    }
+
+
+    //var db = Database.Open("kronixtechdb");
+    //var selectQueryString = "SELECT * FROM cabmaster ORDER BY VehicleNo";
+    //var data = db.Query(selectQueryString);
+    //var grid = new WebGrid(source: data,
+    //                       defaultSort: "VehicleNo",
+    //                       rowsPerPage: 4);
+    //grid.SortDirection = SortDirection.Ascending;
+}
+
+@section sectionNavDashboard{
+    <ul class="select">
+        <li><a href="#nogo"><b>Dashboard</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="#nogo">Dashboard Details 1</a></li>
+                    <li><a href="#nogo">Dashboard Details 2</a></li>
+                    <li><a href="#nogo">Dashboard Details 3</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavCab{
+    <ul class="current">
+        <li><a href="#nogo"><b>CAB</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub show">
+                <ul class="sub">
+                    <li class="sub_show"><a href="~/AddCab">Add Cab</a></li>
+                    <li><a href="~/BookCab">Book Cab</a></li>
+                    <li><a href="~/LocateCab">Locate Cab</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavCustomer{
+    <ul class="select">
+        <li><a href="#nogo"><b>Customer</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="~/AddCustomer">Add</a></li>
+                    <li><a href="#nogo">Categories Details 2</a></li>
+                    <li><a href="#nogo">Categories Details 3</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavReport{
+    <ul class="select">
+        <li><a href="#nogo"><b>Report</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="#nogo">Transaction</a></li>
+                    <li><a href="#nogo">Cab</a></li>
+                    <li><a href="#nogo">Customer</a></li>
+
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+@section sectionNavAdmin{
+    <ul class="select">
+        <li><a href="#nogo"><b>Administration</b><!--[if IE 7]><!--></a><!--<![endif]-->
+            <!--[if lte IE 6]><table><tr><td><![endif]-->
+            <div class="select_sub">
+                <ul class="sub">
+                    <li><a href="~/ListUsers">Add User</a></li>
+                    <li><a href="#nogo">Change Password</a></li>
+                    <li><a href="#nogo">Backup Database</a></li>
+                </ul>
+            </div>
+            <!--[if lte IE 6]></td></tr></table></a><![endif]-->
+        </li>
+    </ul>
+}
+
+<div id="page-heading">
+    <h1>Book Cab</h1>
+</div>
+
+<table border="0" width="100%" cellpadding="0" cellspacing="0" id="content-table">
+    <tr>
+        <th rowspan="3" class="sized">
+            <img src="~/Images/shared/side_shadowleft.jpg" width="20" height="300" alt="" /></th>
+        <th class="topleft"></th>
+        <td id="tbl-border-top">&nbsp;</td>
+        <th class="topright"></th>
+        <th rowspan="3" class="sized">
+            <img src="~/Images/shared/side_shadowright.jpg" width="20" height="300" alt="" /></th>
+    </tr>
+    <tr>
+        <td id="tbl-border-left"></td>
+        <td>
+            <!--  start content-table-inner -->
+            <div id="content-table-inner">
+
+               
+                    <table border="0" width="100%" cellpadding="0" cellspacing="0" cell-border="1">
+                        <tr valign="top">
+                            <td>
+
+                                <!--  start step-holder -->
+                                <div id="step-holder">
+                                    <div class="step-no">1</div>
+                                    <div class="step-dark-left"><a href="">Book Cab</a></div>
+                                    <div class="step-dark-right">&nbsp;</div>
+                                    <div class="step-no-off">2</div>
+                                    <div class="step-light-left">Assign Cab</div>
+                                    <div class="step-light-round">&nbsp;</div>
+                                    <div class="clear"></div>
+                                </div>
+                                <!--  end step-holder -->
+
+                                <!--  AM[01]-->
+                                <table border="0" cellpadding="0" cellspacing="0" cell-border="1" id="id-form">
+                                    <tr>
+                                        <th valign="top">Booking No.</th>
+                                        <td>
+                                            <input name="txtTransactionID" type="text" id="txtTransactionID" disabled="disabled" class="inp-form" />
+                                        </td>
+                                        <th valign="top"></th>
+                                        <th valign="top">Booking Status</th>
+                                        <td>
+                                            <select name="ddStatus" id="ddStatus" class="styledselect_form_1">
+                                                <option value="1">Open</option>
+                                                <option selected="selected" value="2">Dispatched</option>
+                                                <option value="3">Cancelled</option>
+                                                <option value="4">Closed</option>
+
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input id="cbAdvanceBooking" type="checkbox" name="cbAdvanceBooking" disabled="disabled" />
+                                        </td>
+                                        <td>Advance Booking</td>
+                                        <td></td>
+                                        <th valign="top">Booking Date</th>
+                                        <td>
+                                            <table border="0" cellpadding="0" cellspacing="0">
+                                                <tr valign="top">
+                                                    
+                                                        <td>
+
+                                                            <form id="chooseDateForm" action="#">
+                                                            <select id="d" class="styledselect-day">
+                                                                <option value="">dd</option>
+                                                                <option value="1">1</option>
+                                                                <option value="2">2</option>
+                                                                <option value="3">3</option>
+                                                                <option value="4">4</option>
+                                                                <option value="5">5</option>
+                                                                <option value="6">6</option>
+                                                                <option value="7">7</option>
+                                                                <option value="8">8</option>
+                                                                <option value="9">9</option>
+                                                                <option value="10">10</option>
+                                                                <option value="11">11</option>
+                                                                <option value="12">12</option>
+                                                                <option value="13">13</option>
+                                                                <option value="14">14</option>
+                                                                <option value="15">15</option>
+                                                                <option value="16">16</option>
+                                                                <option value="17">17</option>
+                                                                <option value="18">18</option>
+                                                                <option value="19">19</option>
+                                                                <option value="20">20</option>
+                                                                <option value="21">21</option>
+                                                                <option value="22">22</option>
+                                                                <option value="23">23</option>
+                                                                <option value="24">24</option>
+                                                                <option value="25">25</option>
+                                                                <option value="26">26</option>
+                                                                <option value="27">27</option>
+                                                                <option value="28">28</option>
+                                                                <option value="29">29</option>
+                                                                <option value="30">30</option>
+                                                                <option value="31">31</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select id="m" class="styledselect-month">
+                                                                <option value="">mmm</option>
+                                                                <option value="1">Jan</option>
+                                                                <option value="2">Feb</option>
+                                                                <option value="3">Mar</option>
+                                                                <option value="4">Apr</option>
+                                                                <option value="5">May</option>
+                                                                <option value="6">Jun</option>
+                                                                <option value="7">Jul</option>
+                                                                <option value="8">Aug</option>
+                                                                <option value="9">Sep</option>
+                                                                <option value="10">Oct</option>
+                                                                <option value="11">Nov</option>
+                                                                <option value="12">Dec</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select id="y" class="styledselect-year">
+                                                                <option value="">yyyy</option>
+                                                                <option value="2010">2010</option>
+                                                                <option value="2010">2011</option>
+                                                                <option value="2010">2012</option>
+                                                                <option value="2010">2013</option>
+                                                                <option value="2010">2014</option>
+                                                            </select>
+                                                            </form>
+                                                        </td>
+                                                        <td><a href="" id="date-pick">
+                                                            <img src="~/Images/forms/icon_calendar.jpg" alt="" /></a></td>
+                                                    
+                                                </tr>
+                                            </table>
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <th valign="top">Customer Name</th>
+                                        <td>
+                                            <input name="txtCustomerName" type="text" id="txtCustomerName" class="inp-form" />
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">Mobile No.</th>
+                                        
+                                        <td>
+                                            <input type="text" id="txtCustomerMobile" />
+                                        </td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>Address</th>
+                                        <td colspan="2">
+                                            <input name="txtAddress" type="textarea" row="" col="" id="txtAddress" class="form-textarea" />
+                                        </td>
+                                        <th></th>
+                                        <td>
+                                            <input type="submit" name="btnAddCustomer" value="Add Customer" id="btnAddCustomer" />
+                                            <input type="submit" name="btnThanks" value="Thanks" id="btnThanks" disabled="disabled" />
+                                        </td>
+                                    </tr>
+                                </table>
+                                <!--  AM[01]-->
+
+                                <!--  start step-holder -->
+                                <div id="step-holder">
+                                    <div class="step-no">1</div>
+                                    <div class="step-light-left"><a href="">Book Cab</a></div>
+                                    <div class="step-light-right">&nbsp;</div>
+                                    <div class="step-no-off">2</div>
+                                    <div class="step-dark-left">Assign Cab</div>
+                                    <div class="step-dark-round">&nbsp;</div>
+                                    <div class="clear"></div>
+                                </div>
+                                <!--  end step-holder -->
+
+                                <!--  AM[01]-->
+                                <table border="0" cellpadding="0" cellspacing="0" cell-border="1" id="id-form">
+                                    <tr>
+                                        <th valign="top">Place From</th>
+                                        <td>
+                                            <input name="txtPlaceFrom" type="text" id="txtPlaceFrom" class="inp-form" />
+                                        </td>
+                                        <th valign="top"></th>
+                                        <th valign="top">Place To</th>
+                                        <td>
+                                            <input name="txtPlaceTo" type="text" id="txtPlaceTo" tabindex="1" class="inp-form" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Zone</th>
+                                        <td>
+                                            <select id="ddZone" class="styledselect_form_1">
+                                                <option selected="selected" value=""></option>
+                                                <option value="GURGAON">GURGAON</option>
+                                                <option value="NOIDA">NOIDA</option>
+                                                <option value="G. NOIDA">G. NOIDA</option>
+                                                <option value="FARIDABAD">FARIDABAD</option>
+                                                <option value="GAZIABAD">GAZIABAD</option>
+                                                <option value="NDRS">NDRS</option>
+                                                <option value="ODRS">ODRS</option>
+                                                <option value="AIRPORT">AIRPORT</option>
+                                                <option value="DWARKA">DWARKA</option>
+                                                <option value="ROHINI">ROHINI</option>
+                                                <option value="EAST">EAST</option>
+                                                <option value="NORTH">NORTH</option>
+                                                <option value="SOUTH">SOUTH</option>
+                                                <option value="LAXMINAGAR">LAXMINAGAR</option>
+                                                <option value="MODELTOWN">MODELTOWN</option>
+                                                <option value="BAHADURGARH">BAHADURGARH</option>
+                                                <option value="PASCHIM VIHAR">PASCHIM VIHAR</option>
+                                                <option value="MOTI NAGAR">MOTI NAGAR</option>
+                                            </select>
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">Vehicle No</th>
+                                        <td>
+                                            <input name="txtVehicleNo" type="text" id="txtVehicleNo" tabindex="1" class="inp-form" />
+                                            <input type="submit" value="List" id="btnListVehicles" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Driver Contact No</th>
+                                        <td>
+                                            <input name="txtDriverContactNo" type="text" id="txtDriverContactNo" class="inp-form" />
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">Driver Name</th>
+                                        <td>
+                                            <input name="txtDriverName" type="text" id="txtxDriverName" class="inp-form" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">Start Time</th>
+                                        <td>
+                                            <table border="0" cellpadding="0" cellspacing="0">
+                                                <tr valign="top">
+                                                    
+                                                        <td>
+
+                                                            <form id="chooseDateForm" action="#">
+                                                            <select id="d" class="styledselect-day">
+                                                                <option value="">dd</option>
+                                                                <option value="1">1</option>
+                                                                <option value="2">2</option>
+                                                                <option value="3">3</option>
+                                                                <option value="4">4</option>
+                                                                <option value="5">5</option>
+                                                                <option value="6">6</option>
+                                                                <option value="7">7</option>
+                                                                <option value="8">8</option>
+                                                                <option value="9">9</option>
+                                                                <option value="10">10</option>
+                                                                <option value="11">11</option>
+                                                                <option value="12">12</option>
+                                                                <option value="13">13</option>
+                                                                <option value="14">14</option>
+                                                                <option value="15">15</option>
+                                                                <option value="16">16</option>
+                                                                <option value="17">17</option>
+                                                                <option value="18">18</option>
+                                                                <option value="19">19</option>
+                                                                <option value="20">20</option>
+                                                                <option value="21">21</option>
+                                                                <option value="22">22</option>
+                                                                <option value="23">23</option>
+                                                                <option value="24">24</option>
+                                                                <option value="25">25</option>
+                                                                <option value="26">26</option>
+                                                                <option value="27">27</option>
+                                                                <option value="28">28</option>
+                                                                <option value="29">29</option>
+                                                                <option value="30">30</option>
+                                                                <option value="31">31</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select id="m" class="styledselect-month">
+                                                                <option value="">mmm</option>
+                                                                <option value="1">Jan</option>
+                                                                <option value="2">Feb</option>
+                                                                <option value="3">Mar</option>
+                                                                <option value="4">Apr</option>
+                                                                <option value="5">May</option>
+                                                                <option value="6">Jun</option>
+                                                                <option value="7">Jul</option>
+                                                                <option value="8">Aug</option>
+                                                                <option value="9">Sep</option>
+                                                                <option value="10">Oct</option>
+                                                                <option value="11">Nov</option>
+                                                                <option value="12">Dec</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select id="y" class="styledselect-year">
+                                                                <option value="">yyyy</option>
+                                                                <option value="2010">2010</option>
+                                                                <option value="2010">2011</option>
+                                                                <option value="2010">2012</option>
+                                                                <option value="2010">2013</option>
+                                                                <option value="2010">2014</option>
+                                                            </select>
+                                                            </form>
+                                                        </td>
+                                                        <td><a href="" id="date-pick">
+                                                            <img src="~/Images/forms/icon_calendar.jpg" alt="" /></a></td>
+                                                    
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td></td>
+                                        <th valign="top">End Time</th>
+                                        <td>
+                                            <table border="0" cellpadding="0" cellspacing="0">
+                                                <tr valign="top">
+                                                    
+                                                        <td>
+
+                                                            <form id="chooseDateForm" action="#">
+                                                            <select id="d" class="styledselect-day">
+                                                                <option value="">dd</option>
+                                                                <option value="1">1</option>
+                                                                <option value="2">2</option>
+                                                                <option value="3">3</option>
+                                                                <option value="4">4</option>
+                                                                <option value="5">5</option>
+                                                                <option value="6">6</option>
+                                                                <option value="7">7</option>
+                                                                <option value="8">8</option>
+                                                                <option value="9">9</option>
+                                                                <option value="10">10</option>
+                                                                <option value="11">11</option>
+                                                                <option value="12">12</option>
+                                                                <option value="13">13</option>
+                                                                <option value="14">14</option>
+                                                                <option value="15">15</option>
+                                                                <option value="16">16</option>
+                                                                <option value="17">17</option>
+                                                                <option value="18">18</option>
+                                                                <option value="19">19</option>
+                                                                <option value="20">20</option>
+                                                                <option value="21">21</option>
+                                                                <option value="22">22</option>
+                                                                <option value="23">23</option>
+                                                                <option value="24">24</option>
+                                                                <option value="25">25</option>
+                                                                <option value="26">26</option>
+                                                                <option value="27">27</option>
+                                                                <option value="28">28</option>
+                                                                <option value="29">29</option>
+                                                                <option value="30">30</option>
+                                                                <option value="31">31</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select id="m" class="styledselect-month">
+                                                                <option value="">mmm</option>
+                                                                <option value="1">Jan</option>
+                                                                <option value="2">Feb</option>
+                                                                <option value="3">Mar</option>
+                                                                <option value="4">Apr</option>
+                                                                <option value="5">May</option>
+                                                                <option value="6">Jun</option>
+                                                                <option value="7">Jul</option>
+                                                                <option value="8">Aug</option>
+                                                                <option value="9">Sep</option>
+                                                                <option value="10">Oct</option>
+                                                                <option value="11">Nov</option>
+                                                                <option value="12">Dec</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select id="y" class="styledselect-year">
+                                                                <option value="">yyyy</option>
+                                                                <option value="2010">2010</option>
+                                                                <option value="2010">2011</option>
+                                                                <option value="2010">2012</option>
+                                                                <option value="2010">2013</option>
+                                                                <option value="2010">2014</option>
+                                                            </select>
+                                                            </form>
+                                                        </td>
+                                                        <td><a href="" id="date-pick">
+                                                            <img src="~/Images/forms/icon_calendar.jpg" alt="" /></a></td>
+                                                    
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th valign="top">
+                                            <input type="submit" value="SMS Driver"></th>
+                                        <td>
+                                            <input type="submit" value="Show Adv Booking"></td>
+                                        <td>
+                                            <input type="submit" value="Assign Cab"></td>
+                                        <th valign="top">
+                                            <input type="submit" value="Cancel Booking"></th>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td style="float: right;">
+                                            <input type="button" value="" class="form-submit" /></td>
+                                        <td></td>
+                                        <td>
+                                            <input type="reset" value="" class="form-reset" /></td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                                @*<!--  AM[01]-->*@
+
+                            </td>
+                            <td></td>
+    </tr>
+    <tr valign="top">
+        <td>
+
+            <table border="0" cellpadding="0" cellspacing="0" id="id-form" width="60%">
+                <tr>
+                    <th valign="top">Search</th>
+                    <th valign="top">
+                        <input name="txtSearchVehicleNo" type="text" id="txtSearchVehicleNo" class="inp-form" />
+                    </th>
+                    <td></td>
+                    <th valign="top">
+                        <input type="button" value="Search" title="Search" class="form-submit" />
+                    </th>
+                    <td></td>
+                </tr>
+            </table>
+
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            <div id="grid">
+                @*@grid.GetHtml(
+                                    tableStyle: "grid",
+                                    headerStyle: "head",
+                                    alternatingRowStyle: "alt",
+                                    columns: grid.Columns(
+                                        grid.Column("VehicleNo", "VehicleNo", style: "product"),
+                                        grid.Column("CurDate", style: "product"),
+                                        grid.Column("DriverName", style: "product"),
+                                        grid.Column("MobileNo", style: "product"),
+                                        grid.Column("Location", style: "product"),
+                                        grid.Column("VType", style: "product"),
+                                        grid.Column("StartReading", style: "product"),
+                                        grid.Column("EndReading", style: "product"),
+                                        grid.Column("TotalRun", style: "product"),
+                                        grid.Column("Remarks", style: "product")
+                                        //grid.Column("Name", "Product", style: "product"),
+                                        //grid.Column("Description", format: @<i>@item.Description</i>),
+                                        //grid.Column("Price", format: @<text>$@item.Price</text>)
+                                    )
+                                )*@
+            </div>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            <img src="~/Images/shared/blank.gif" width="695" height="1" alt="blank" /></td>
+        <td></td>
+    </tr>
+</table>
+
+                <div class="clear"></div>
+
+
+</div>
+            <!--  end content-table-inner  -->
+</td>
+        <td id="tbl-border-right"></td>
+</tr>
+    <tr>
+        <th class="sized bottomleft"></th>
+        <td id="tbl-border-bottom">&nbsp;</td>
+        <th class="sized bottomright"></th>
+    </tr>
+</table>

@@ -1,0 +1,8 @@
+﻿@{
+    var db = Database.Open("StarterSite");
+    var sql = "SELECT CustomerMobile FROM CustomerDetails WHERE CustomerMobile LIKE @0";
+    var term = Request["q"] + "%";
+    var result = db.Query(sql, term);
+    var data = result.Select(c => new { label = c.CustomerMobile });    
+    Json.Write(data, Response.Output);
+}
